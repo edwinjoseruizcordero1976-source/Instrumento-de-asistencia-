@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instrumento de Acompañamiento - Sistema de Alerta Temprana (SAT) | PREPARA 360</title>
+    <style>
+        :root {
+            --primary-blue: #0b2545;
+            --secondary-blue: #134074;
+            --accent-red: #8b0000;
+            --light-bg: #f4f6f9;
+            --border-color: #cbd5e1;
+            --text-color: #1e293b;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+            border-top: 6px solid var(--accent-red);
+        }
+        .header {
+            background: var(--primary-blue);
+            color: #ffffff;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 22px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .header p {
+            margin: 8px 0 0 0;
+            font-size: 14px;
+            color: #93c5fd;
+        }
+        .import-section {
+            background: #e2e8f0;
+            padding: 12px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+        }
+        .import-section input[type="file"] {
+            font-size: 12px;
+        }
+        form {
+            padding: 30px;
+        }
+        fieldset {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px 25px;
+            margin-bottom: 25px;
+            background: #fafafa;
+        }
+        legend {
+            font-weight: bold;
+            color: var(--secondary-blue);
+            background: #e2e8f0;
+            padding: 6px 15px;
+            border-radius: 4px;
+            font-size: 15px;
+            border: 1px solid var(--border-color);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: var(--text-color);
+        }
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            background: #fff;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 3px rgba(19, 64, 116, 0.15);
+        }
+        textarea {
+            resize: vertical;
+            height: 100px;
+        }
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        .checkbox-group label {
+            font-weight: normal;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        .actions-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn {
+            border: none;
+            padding: 14px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-save {
+            background-color: var(--secondary-blue);
+            color: white;
+        }
+        .btn-save:hover {
+            background-color: #0d2e54;
+        }
+        .btn-email {
+            background-color: var(--accent-red);
+            color: white;
+        }
+        .btn-email:hover {
+            background-color: #a30000;
+        }
+        .btn-json {
+            background-color: #047857;
+            color: white;
+            grid-column: span 2;
+        }
+        .btn-json:hover {
+            background-color: #065f46;
+        }
+        .btn-clear {
+            background-color: #64748b;
+            color: white;
+            grid-column: span 2;
+        }
+        .btn-clear:hover {
+            background-color: #475569;
+        }
+        .status-msg {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+        .footer-note {
+            text-align: center;
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 25px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Ministerio de Educación - Regional 15</h1>
+        <p>PREPARA 360 | Instrumento de Acompañamiento y Monitoreo - Acción 7 (SAT)</p>
+    </div>
+
+    <!-- Panel auxiliar para que tú cargues un archivo de respuestas recibido -->
+    <div class="import-section">
+        <span><strong>Panel de Control (Técnico):</strong> Cargar datos recibidos (.json):</span>
+        <input type="file" id="importFile" accept=".json" onchange="cargarDatosDesdeArchivo(event)">
+    </div>
+
+    <form id="satForm">
+        <fieldset>
+            <legend>1. Datos Generales de la Visita</legend>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="distrito">Distrito Educativo:</label>
+                    <input type="text" id="distrito" name="distrito" value="Distrito 15-02" required>
+                </div>
+                <div class="form-group">
+                    <label for="centro">Centro Educativo:</label>
+                    <input type="text" id="centro" name="centro" value="10232 - Aida Cartagena Portalatín" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fecha">Fecha de Acompañamiento:</label>
+                    <input type="date" id="fecha" name="fecha" value="2026-09-29" required>
+                </div>
+                <div class="form-group">
+                    <label for="hora">Hora de Intervención:</label>
+                    <input type="time" id="hora" name="hora" value="18:30" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="responsable">Técnico Responsable:</label>
+                    <input type="text" id="responsable" name="responsable" value="Edwin Ruiz (Técnico Regional)" required>
+                </div>
+                <div class="form-group">
+                    <label for="modalidad">PREPARA:</label>
+                    <select id="modalidad" name="modalidad" required>
+                        <option value="Nocturno">Nocturno</option>
+                        <option value="Sabatino">Sabatino</option>
+                        <option value="Dominical">Dominical</option>
+                    </select>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>2. Indicadores del Sistema de Alerta Temprana (SAT)</legend>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="matricula_inscrita">Matrícula Inscrita:</label>
+                    <input type="text" id="matricula_inscrita" name="matricula_inscrita" placeholder="Ej. 45 estudiantes" required>
+                </div>
+                <div class="form-group">
+                    <label for="estudiantes_presentes">Estudiantes Presentes hoy:</label>
+                    <input type="text" id="estudiantes_presentes" name="estudiantes_presentes" placeholder="Ej. 38 estudiantes" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="indice_asistencia">Nivel de Asistencia Registrado:</label>
+                    <select id="indice_asistencia" name="indice_asistencia" required>
+                        <option value="Excelente (90% - 100%)">Excelente (90% - 100%)</option>
+                        <option value="Regular (75% - 89%)">Regular (75% - 89%)</option>
+                        <option value="Crítico (< 75%)">Crítico (&lt; 75%)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="casos_ausentismo">Casos de Ausentismo Detectados:</label>
+                    <input type="text" id="casos_ausentismo" name="casos_ausentismo" placeholder="Ej. 5 estudiantes o No aplica">
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>3. Protocolos de Retención Escolar y Orientación</legend>
+            <div class="form-group">
+                <label>¿Se activa el protocolo de seguimiento?</label>
+                <div class="checkbox-group">
+                    <label><input type="radio" name="orientacion_activada" value="Sí"> Sí</label>
+                    <label><input type="radio" name="orientacion_activada" value="No"> No</label>
+                    <label><input type="radio" name="orientacion_activada" value="En proceso"> En proceso</label>
+                    <label><input type="radio" name="orientacion_activada" value="No aplica" checked> No aplica</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="causas_ausentismo">Causas Principales Identificadas de Ausentismo/Riesgo:</label>
+                <select id="causas_ausentismo" name="causas_ausentismo" onchange="evaluarOtraCausa()">
+                    <option value="Ninguna / No aplica">Ninguna / No aplica</option>
+                    <option value="Laborales / Horarios de trabajo">Laborales / Horarios de trabajo</option>
+                    <option value="Económicas">Económicas</option>
+                    <option value="Distancia / Transporte">Distancia / Transporte</option>
+                    <option value="Motivos familiares / Salud">Motivos familiares / Salud</option>
+                    <option value="Otras">Otras</option>
+                </select>
+            </div>
+            <div class="form-group" id="grupo_especifique" style="display: none;">
+                <label for="causas_especifique">Especifique:</label>
+                <input type="text" id="causas_especifique" name="causas_especifique" placeholder="Escriba la otra causa de ausentismo aquí...">
+            </div>
+            <div class="form-group full-width">
+                <label for="acciones_reten">Acciones Inmediatas Acordadas para la Retención:</label>
+                <textarea id="acciones_reten" name="acciones_reten" placeholder="Describa llamadas de seguimiento, acuerdos con facilitadores o visitas domiciliarias planificadas..."></textarea>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>4. Observaciones y Recomendaciones Técnicas</legend>
+            <div class="form-group full-width">
+                <label for="observaciones">Observaciones Generales:</label>
+                <textarea id="observaciones" name="observaciones" placeholder="Ingrese hallazgos, ambiente del centro, participación docente y notas relevantes de la supervisión..." required></textarea>
+            </div>
+        </fieldset>
+
+        <div class="actions-container">
+            <button type="button" class="btn btn-save" onclick="guardarDatos()">Guardar en el Navegador</button>
+            <button type="button" class="btn btn-email" onclick="enviarPorCorreo()">Enviar por Correo</button>
+            <button type="button" class="btn btn-json" onclick="descargarRespaldoJSON()">📥 Descargar Archivo con Datos (JSON)</button>
+            <button type="button" class="btn btn-clear" onclick="limpiarDatos()">Borrar Datos</button>
+        </div>
+        <div id="statusMsg" class="status-msg"></div>
+
+        <div class="footer-note">
+            <p>Sistema automatizado de monitoreo PREPARA 360 &bull; Regional 15</p>
+        </div>
+    </form>
+</div>
+
+<script>
+    const STORAGE_KEY = 'prepara360_sat_10232_20260929';
+
+    function evaluarOtraCausa() {
+        const selectCausas = document.getElementById('causas_ausentismo');
+        const grupoEspecifique = document.getElementById('grupo_especifique');
+        if (selectCausas.value === 'Otras') {
+            grupoEspecifique.style.display = 'block';
+        } else {
+            grupoEspecifique.style.display = 'none';
+            document.getElementById('causas_especifique').value = '';
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedData = localStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+            poblarFormulario(JSON.parse(savedData));
+            mostrarMensaje("Datos recuperados correctamente de la memoria local.", "#166534", "#dcfce7");
+        }
+    });
+
+    function poblarFormulario(data) {
+        for (const key in data) {
+            const element = document.querySelector(`[name="${key}"]`);
+            if (element) {
+                if (element.type === 'radio') {
+                    const radio = document.querySelector(`[name="${key}"][value="${data[key]}"]`);
+                    if (radio) radio.checked = true;
+                } else {
+                    element.value = data[key];
+                }
+            }
+        }
+        evaluarOtraCausa();
+    }
+
+    function obtenerDatosFormulario() {
+        const form = document.getElementById('satForm');
+        const formData = new FormData(form);
+        const dataObj = {};
+        formData.forEach((value, key) => {
+            dataObj[key] = value;
+        });
+        return dataObj;
+    }
+
+    function guardarDatos() {
+        const dataObj = obtenerDatosFormulario();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dataObj));
+        mostrarMensaje("¡Datos guardados con éxito! Si vuelve a abrir este archivo en este equipo, la información estará disponible.", "#166534", "#dcfce7");
+    }
+
+    function descargarRespaldoJSON() {
+        const dataObj = obtenerDatosFormulario();
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataObj, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", "reporte_sat_10232.json");
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+        mostrarMensaje("Archivo de respaldo generado. Puede enviárselo al técnico para lectura.", "#047857", "#d1fae5");
+    }
+
+    function cargarDatosDesdeArchivo(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                poblarFormulario(data);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                mostrarMensaje("¡Datos cargados y aplicados exitosamente desde el archivo recibido!", "#166534", "#dcfce7");
+            } catch (error) {
+                mostrarMensaje("Error al leer el archivo JSON.", "#991b1b", "#fee2e2");
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function limpiarDatos() {
+        if (confirm("¿Está seguro de que desea borrar todos los datos guardados?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            document.getElementById('satForm').reset();
+            evaluarOtraCausa();
+            mostrarMensaje("Datos eliminados.", "#991b1b", "#fee2e2");
+        }
+    }
+
+    function enviarPorCorreo() {
+        guardarDatos();
+        const distrito = document.getElementById('distrito').value;
+        const centro = document.getElementById('centro').value;
+        const fecha = document.getElementById('fecha').value;
+        const hora = document.getElementById('hora').value;
+        const responsable = document.getElementById('responsable').value;
+        const modalidad = document.getElementById('modalidad').value;
+        const matricula = document.getElementById('matricula_inscrita').value;
+        const presentes = document.getElementById('estudiantes_presentes').value;
+        const asistencia = document.getElementById('indice_asistencia').value;
+        const ausentismo = document.getElementById('casos_ausentismo').value;
+        
+        let orientacion = "No aplica";
+        const radios = document.getElementsByName('orientacion_activada');
+        for (const r of radios) {
+            if (r.checked) orientacion = r.value;
+        }
+
+        let causas = document.getElementById('causas_ausentismo').value;
+        if (causas === 'Otras') {
+            causas += ": " + document.getElementById('causas_especifique').value;
+        }
+
+        const acciones = document.getElementById('acciones_reten').value;
+        const observaciones = document.getElementById('observaciones').value;
+
+        const asunto = encodeURIComponent("Reporte de Acompañamiento SAT - " + centro);
+        const cuerpo = encodeURIComponent(
+            "INFORME DE ACOMPAÑAMIENTO Y MONITOREO - PREPARA 360\n" +
+            "==================================================\n\n" +
+            "1. DATOS GENERALES:\n" +
+            "- Distrito Educativo: " + distrito + "\n" +
+            "- Centro Educativo: " + centro + "\n" +
+            "- Fecha: " + fecha + " | Hora: " + hora + "\n" +
+            "- Técnico Responsable: " + responsable + "\n" +
+            "- Modalidad: " + modalidad + "\n\n" +
+            "2. INDICADORES SAT:\n" +
+            "- Matrícula Inscrita: " + matricula + "\n" +
+            "- Estudiantes Presentes: " + presentes + "\n" +
+            "- Nivel de Asistencia: " + asistencia + "\n" +
+            "- Casos de Ausentismo: " + ausentismo + "\n\n" +
+            "3. RETENCIÓN Y ORIENTACIÓN:\n" +
+            "- Protocolo de Orientación Activado: " + orientacion + "\n" +
+            "- Causas de Ausentismo: " + causas + "\n" +
+            "- Acciones de Retención: " + acciones + "\n\n" +
+            "4. OBSERVACIONES:\n" +
+            observaciones + "\n\n" +
+            "[Generado desde el Instrumento Interactivo PREPARA 360]"
+        );
+
+        window.location.href = `mailto:edwinjoseruizcordero1976@gmail.com?subject=${asunto}&body=${cuerpo}`;
+        mostrarMensaje("Se ha abierto su cliente de correo con el reporte listo para enviar.", "#1640af", "#dbeafe");
+    }
+
+    function mostrarMensaje(texto, colorTexto, colorFondo) {
+        const msg = document.getElementById('statusMsg');
+        msg.textContent = texto;
+        msg.style.color = colorTexto;
+        msg.style.backgroundColor = colorFondo;
+        msg.style.display = 'block';
+        setTimeout(() => {
+            msg.style.display = 'none';
+        }, 6000);
+    }
+</script>
+
+</body>
+</html>
